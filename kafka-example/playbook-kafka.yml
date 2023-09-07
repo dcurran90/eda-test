@@ -1,0 +1,7 @@
+- hosts: localhost
+  connection: local
+  tasks:
+    - debug:
+        msg: "Hello, Kafka!"
+    - debug:
+        var: ansible_eda.event.body

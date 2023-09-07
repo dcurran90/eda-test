@@ -1,0 +1,43 @@
+---
+- name: Listen for events on a webhook
+  hosts: all
+
+## Define our source for events
+
+  sources:
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+
+## Define the conditions we are looking for
+
+  rules:
+    - name: Say Hello
+      condition: event.payload.message == "Ansible is super cool"
+
+## Define the action we should take should the condition be met
+
+      action:
+        run_playbook:
+          name: hello-world/playbook-hello.yml
+
+
+## Room for discussion because "all" doesn't act necessarily as expected (EXAMPLE 2)
+## and "any" prepends a metadata key (EXAMPLE 3 and 4)
+    - name: webhook2
+      condition: 
+        all:
+          - event.payload.message == "hook2"
+          - event.payload.ip_list is defined
+      action:
+        run_playbook:
+          name: hello-world/playbook-webhook2.yml
+
+    - name: webhook3
+      condition: 
+        any:
+          - event.payload.message == "hook3"
+          - event.payload.message == "hook4"
+      action:
+        run_playbook:
+          name: hello-world/playbook-webhook3.yml

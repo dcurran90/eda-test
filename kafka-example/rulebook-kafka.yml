@@ -1,0 +1,26 @@
+- name: Listen for events on kafka
+  hosts: all
+
+  sources:
+    - ansible.eda.kafka:
+        host:  "{{ KAFKA_HOST }}"
+        port:  "{{ KAFKA_PORT }}"
+        topic: kafka-test-topic
+        group_id: ansible-eda
+    - ansible.eda.webhook:
+        host: 0.0.0.0
+        port: 5000
+
+  rules:
+    - name: kafka
+      condition: event.body != ""
+      action:
+        run_playbook:
+          name: kafka-example/playbook-kafka.yml
+
+    - name: webhook
+      condition: event.payload.message == "Ansible is super cool"
+      action:
+        run_playbook:
+          name: kafka-example/playbook-webhook.yml
+          var_root: payload
